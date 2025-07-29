@@ -139,3 +139,18 @@ void draw_W_bitmap(void)
 {
   draw_rgb565_bitmap(W);
 }
+
+/**
+  * @brief  Draws a red triangle on a whole half of the display.
+  * @retval None
+  */
+void draw_diagonal_triangle(void)
+{
+  for (int i = 0; i < 64; i++)
+  {
+    for (int j = 0; j <= i; j++)
+    {
+	  set_pixel(j, i, 1, 0, 0);
+	}
+  }
+}

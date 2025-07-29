@@ -1,12 +1,17 @@
 #include "utils.h"
+#include "oe_control.h"
+#include "hub75.h"
 
+// ----------------------------------------------------------------------------
+// Utility functions
+// ----------------------------------------------------------------------------
 
 /**
-  * @brief  Brightens and dims the screen.
+  * @brief  Brightens and dims the screen using PWM.
   * @param  max_brightness: determines maximum brightness level (0-100)
   * @retval None
   */
-void screen_fade(uint8_t max_brightness)
+void PWM_screen_fade(uint8_t max_brightness)
 {
   if (max_brightness > 100) max_brightness = 100;
 

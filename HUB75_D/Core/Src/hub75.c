@@ -1,16 +1,17 @@
 #include "hub75.h"
 #include "stm32f1xx_hal.h"
 #include "cmsis_gcc.h"
+#include "utils.h"
 
-// -------------------------------------------------------------------------------------------------------------------
-// RGB frame buffer
-// -------------------------------------------------------------------------------------------------------------------
+// ----------------------------------------------------------------------------
+// RGB frame buffer and row counter
+// ----------------------------------------------------------------------------
 uint8_t framebuffer[PANEL_WIDTH][PANEL_HEIGHT][3];
+static uint8_t current_row = 0;
 
-
-// -------------------------------------------------------------------------------------------------------------------
+// ----------------------------------------------------------------------------
 // Display management functions
-// -------------------------------------------------------------------------------------------------------------------
+// ----------------------------------------------------------------------------
 
 // -- GPIO manipulation
 
@@ -30,9 +31,13 @@ void delay_short(int reps)
   */
 void clock_pulse(void)
 {
-  HAL_GPIO_WritePin(PORT_A, CLK_PIN, GPIO_PIN_SET);
-  delay_short(1);
-  HAL_GPIO_WritePin(PORT_A, CLK_PIN, GPIO_PIN_RESET);
+//  HAL_GPIO_WritePin(PORT_A, CLK_PIN, GPIO_PIN_SET);
+//  //delay_short(1);
+//  HAL_GPIO_WritePin(PORT_A, CLK_PIN, GPIO_PIN_RESET);
+
+  // Equivalent of the code above but faster
+  PORT_A->BSRR = CLK_PIN;
+  PORT_A->BRR  = CLK_PIN;
 }
 
 /**
@@ -41,9 +46,13 @@ void clock_pulse(void)
   */
 void latch_data(void)
 {
-  HAL_GPIO_WritePin(PORT_B, LAT_PIN, GPIO_PIN_SET);
-  delay_short(1);
-  HAL_GPIO_WritePin(PORT_B, LAT_PIN, GPIO_PIN_RESET);
+//  HAL_GPIO_WritePin(PORT_B, LAT_PIN, GPIO_PIN_SET);
+//  //delay_short(1);
+//  HAL_GPIO_WritePin(PORT_B, LAT_PIN, GPIO_PIN_RESET);
+
+  // Equivalent of the code above but faster
+  PORT_B->BSRR = LAT_PIN;
+  PORT_B->BRR  = LAT_PIN;
 }
 
 /**
@@ -53,7 +62,11 @@ void latch_data(void)
   */
 void output_enable(uint8_t enable)
 {
-  HAL_GPIO_WritePin(PORT_B, OE_PIN, enable ? GPIO_PIN_RESET : GPIO_PIN_SET);
+//  HAL_GPIO_WritePin(PORT_B, OE_PIN, enable ? GPIO_PIN_RESET : GPIO_PIN_SET);
+
+  // Equivalent of the code above but faster
+  if (enable) PORT_B->BRR   = OE_PIN;
+  else		  PORT_B->BSRR  = OE_PIN;
 }
 
 /**
@@ -65,10 +78,19 @@ void set_row(uint8_t row)
 {
   if (row >= RGB2_PINS_OFFSET) return;
 
-  HAL_GPIO_WritePin(PORT_B, A_PIN, (row & 0x01) ? GPIO_PIN_SET : GPIO_PIN_RESET);
-  HAL_GPIO_WritePin(PORT_B, B_PIN, (row & 0x02) ? GPIO_PIN_SET : GPIO_PIN_RESET);
-  HAL_GPIO_WritePin(PORT_B, C_PIN, (row & 0x04) ? GPIO_PIN_SET : GPIO_PIN_RESET);
-  HAL_GPIO_WritePin(PORT_B, D_PIN, (row & 0x08) ? GPIO_PIN_SET : GPIO_PIN_RESET);
+//  HAL_GPIO_WritePin(PORT_B, A_PIN, (row & 0x01) ? GPIO_PIN_SET : GPIO_PIN_RESET);
+//  HAL_GPIO_WritePin(PORT_B, B_PIN, (row & 0x02) ? GPIO_PIN_SET : GPIO_PIN_RESET);
+//  HAL_GPIO_WritePin(PORT_B, C_PIN, (row & 0x04) ? GPIO_PIN_SET : GPIO_PIN_RESET);
+//  HAL_GPIO_WritePin(PORT_B, D_PIN, (row & 0x08) ? GPIO_PIN_SET : GPIO_PIN_RESET);
+
+  // Reset all pins
+  PORT_B->BRR = A_PIN | B_PIN | C_PIN | D_PIN;
+
+  // Set pins based on row number
+  if (row & 0x01) PORT_B->BSRR = A_PIN;
+  if (row & 0x02) PORT_B->BSRR = B_PIN;
+  if (row & 0x04) PORT_B->BSRR = C_PIN;
+  if (row & 0x08) PORT_B->BSRR = D_PIN;
 }
 
 
@@ -102,12 +124,11 @@ void clear_framebuffer(void)
   */
 void set_pixel(uint8_t x, uint8_t y, uint8_t r, uint8_t g, uint8_t b)
 {
-  if (x < PANEL_WIDTH && y < PANEL_HEIGHT)
-  {
-    framebuffer[x][y][0] = r;
-    framebuffer[x][y][1] = g;
-    framebuffer[x][y][2] = b;
-  }
+  if (x >= PANEL_WIDTH || y >= PANEL_HEIGHT) return;
+
+  framebuffer[x][y][0] = r;
+  framebuffer[x][y][1] = g;
+  framebuffer[x][y][2] = b;
 }
 
 /**
@@ -121,9 +142,6 @@ int is_coordinate_on_screen(const uint8_t x, const uint8_t y)
   return (x >= 0 && x < PANEL_WIDTH && y >= 0 && y < PANEL_HEIGHT);
 }
 
-
-// -- Drawing
-
 /**
   * @brief  Draws the entire framebuffer on the screen.
   * @retval None
@@ -131,16 +149,15 @@ int is_coordinate_on_screen(const uint8_t x, const uint8_t y)
 void draw_framebuffer(void)
 {
   for (uint8_t row = 0; row < RGB2_PINS_OFFSET; row++) {
-    //output_enable(0);
-	set_row(row);   // <- Logically it should be put here but doesn't work in a loop
-	clock_pulse();
+	output_enable(0);
+
+    set_row(row);   // <- Logically it should be put here but doesn't work in a loop
 	draw_row(row, 0);
 	draw_row(row, PANEL_HEIGHT_HALF);
 	latch_data();
-	clock_pulse();
-	//set_row(row);
-    //output_enable(1);
-	//HAL_Delay(10);
+
+	output_enable(1);
+	delay_short(2750);
   }
 }
 
@@ -162,13 +179,25 @@ void draw_row(uint8_t row, uint8_t offset)
 	upper = row + offset;
 	lower = upper + RGB2_PINS_OFFSET;
 
-    HAL_GPIO_WritePin(PORT_A, R1_PIN, framebuffer[col][upper][0] ? GPIO_PIN_SET : GPIO_PIN_RESET);
-    HAL_GPIO_WritePin(PORT_A, G1_PIN, framebuffer[col][upper][1] ? GPIO_PIN_SET : GPIO_PIN_RESET);
-    HAL_GPIO_WritePin(PORT_A, B1_PIN, framebuffer[col][upper][2] ? GPIO_PIN_SET : GPIO_PIN_RESET);
+//    HAL_GPIO_WritePin(PORT_A, R1_PIN, framebuffer[col][upper][0] ? GPIO_PIN_SET : GPIO_PIN_RESET);
+//    HAL_GPIO_WritePin(PORT_A, G1_PIN, framebuffer[col][upper][1] ? GPIO_PIN_SET : GPIO_PIN_RESET);
+//    HAL_GPIO_WritePin(PORT_A, B1_PIN, framebuffer[col][upper][2] ? GPIO_PIN_SET : GPIO_PIN_RESET);
+//
+//    HAL_GPIO_WritePin(PORT_A, R2_PIN, framebuffer[col][lower][0] ? GPIO_PIN_SET : GPIO_PIN_RESET);
+//    HAL_GPIO_WritePin(PORT_A, G2_PIN, framebuffer[col][lower][1] ? GPIO_PIN_SET : GPIO_PIN_RESET);
+//    HAL_GPIO_WritePin(PORT_A, B2_PIN, framebuffer[col][lower][2] ? GPIO_PIN_SET : GPIO_PIN_RESET);
 
-    HAL_GPIO_WritePin(PORT_A, R2_PIN, framebuffer[col][lower][0] ? GPIO_PIN_SET : GPIO_PIN_RESET);
-    HAL_GPIO_WritePin(PORT_A, G2_PIN, framebuffer[col][lower][1] ? GPIO_PIN_SET : GPIO_PIN_RESET);
-    HAL_GPIO_WritePin(PORT_A, B2_PIN, framebuffer[col][lower][2] ? GPIO_PIN_SET : GPIO_PIN_RESET);
+    // Reset all pins
+    PORT_A->BRR = R1_PIN | G1_PIN | B1_PIN | R2_PIN | G2_PIN | B2_PIN;
+
+    // Set pins based on row and col number
+    if (framebuffer[col][upper][0]) PORT_A->BSRR = R1_PIN;
+    if (framebuffer[col][upper][1]) PORT_A->BSRR = G1_PIN;
+    if (framebuffer[col][upper][2]) PORT_A->BSRR = B1_PIN;
+
+    if (framebuffer[col][lower][0]) PORT_A->BSRR = R2_PIN;
+    if (framebuffer[col][lower][1]) PORT_A->BSRR = G2_PIN;
+    if (framebuffer[col][lower][2]) PORT_A->BSRR = B2_PIN;
 
     clock_pulse();
   }
@@ -189,7 +218,7 @@ void draw_rgb565_bitmap(const uint16_t* bmp_ptr)
 
       // Extracting colors from RGB565
       uint8_t r_5 = (pixel >> 11) & 0x1F;
-      uint8_t g_6 = (pixel >> 5)  & 0x3F;
+      uint8_t g_6 = (pixel >>  5) & 0x3F;
       uint8_t b_5 =  pixel        & 0x1F;
 
       // Convert to 255-bit color value
@@ -202,4 +231,20 @@ void draw_rgb565_bitmap(const uint16_t* bmp_ptr)
   }
 
   draw_framebuffer();
+}
+
+/**
+  * @brief  Updates rows displayed on the screen
+  *         (Intended to use with Timer Interruption).
+  * @retval None
+  */
+void draw_row_update(void)
+{
+  set_row(current_row);
+  draw_row(current_row, 0);
+  draw_row(current_row, PANEL_HEIGHT_HALF);
+  latch_data();
+
+  current_row++;
+  if (current_row >= RGB2_PINS_OFFSET) current_row = 0;
 }
