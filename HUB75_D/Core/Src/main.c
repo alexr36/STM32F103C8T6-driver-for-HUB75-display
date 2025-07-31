@@ -36,8 +36,9 @@
 
 /* Private define ------------------------------------------------------------*/
 /* USER CODE BEGIN PD */
-#define PWM_BUFFER_SIZE 64
-extern uint16_t pwm_buffer[PWM_BUFFER_SIZE];
+#define PWM_BUFFER_SIZE 		 64
+#define DEFAULT_BRIGHTNESS_LEVEL 55
+
 /* USER CODE END PD */
 
 /* Private macro -------------------------------------------------------------*/
@@ -48,6 +49,7 @@ extern uint16_t pwm_buffer[PWM_BUFFER_SIZE];
 /* Private variables ---------------------------------------------------------*/
 
 /* USER CODE BEGIN PV */
+extern uint16_t pwm_buffer[PWM_BUFFER_SIZE];
 
 /* USER CODE END PV */
 
@@ -94,14 +96,14 @@ int main(void)
   MX_TIM3_Init();
   /* USER CODE BEGIN 2 */
   //OE_PWM_Init();
-  //HAL_TIM_Base_Start_IT(&htim3);
-
+  HAL_TIM_Base_Start_IT(&htim3);
   clear_framebuffer();
+
   //draw_test_cross();
   //draw_diagonal_triangle();
-  draw_W_bitmap();
-  //start_pwm_dma();
-  //HAL_TIM_PWM_Start(&htim3, TIM_CHANNEL_3);
+  //draw_W_bitmap();
+  draw_AHEAD_ONLY_bitmap();
+  //draw_STOP_bitmap();
 
   /* USER CODE END 2 */
 
@@ -109,12 +111,8 @@ int main(void)
   /* USER CODE BEGIN WHILE */
   while (1)
   {
-	//draw_row_update();
-	//screen_fade(98);
-	draw_framebuffer();
-	//draw_framebuffer_manual_fade(2750);
-    // draw_snake_go_in_out();
-
+	//update_brightness();
+	//if (TIM3->CNT > 55) OE_OFF;
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */

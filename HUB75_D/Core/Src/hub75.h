@@ -34,10 +34,17 @@
 #define A_PIN   GPIO_PIN_6  // B6
 #define LAT_PIN GPIO_PIN_7	// B7
 
+#define OE_ON   output_enable(1)
+#define OE_OFF  output_enable(0)
+
 // ----------------------------------------------------------------------------
 // RGB frame buffer
 // ----------------------------------------------------------------------------
-extern uint8_t framebuffer[PANEL_WIDTH][PANEL_HEIGHT][3];
+extern uint8_t  framebuffer[PANEL_WIDTH][PANEL_HEIGHT][3];
+extern uint16_t brightness_level;
+extern int8_t   brightness_increment;
+extern uint8_t  row_step;
+extern uint8_t  current_row;
 
 // ----------------------------------------------------------------------------
 // Display management functions
@@ -53,11 +60,16 @@ void set_row(uint8_t row);
 // -- Configuration
 void clear_framebuffer(void);
 void set_pixel(uint8_t x, uint8_t y, uint8_t r, uint8_t g, uint8_t b);
-int is_coordinate_on_screen(const uint8_t x, const uint8_t y);
+int  is_coordinate_on_screen(const uint8_t x, const uint8_t y);
 
 // -- Drawing
 void draw_framebuffer(void);
 void draw_row(uint8_t row, uint8_t offset);
 void draw_rgb565_bitmap(const uint16_t* bmp_ptr);
+void draw_row_update(void);
+
+// -- Brightness manipulation
+void update_brightness(void);
+void check_brightness(void);
 
 #endif // HUB75_H

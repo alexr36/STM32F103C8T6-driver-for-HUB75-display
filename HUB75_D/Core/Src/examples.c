@@ -1,6 +1,7 @@
 #include "examples.h"
+
+#include "bitmaps.h"
 #include "hub75.h"
-#include "W.h"
 
 /**
   * @brief  Draws four-coloured cross on display's diagonals.
@@ -8,15 +9,16 @@
   */
 void draw_test_cross(void)
 {
-  for (int i = 0; i < PANEL_WIDTH / 2; i++) set_pixel(i, i, 1, 0, 0);  								   // Red
-  for (int i = PANEL_WIDTH / 2; i < PANEL_WIDTH; i++) set_pixel(i, i, 0, 1, 0);  					   // Green
-  for (int i = PANEL_WIDTH - 1; i >= PANEL_WIDTH / 2; i--) set_pixel(i, PANEL_WIDTH - 1 - i, 0, 0, 1); // Blue
-  for (int i = PANEL_WIDTH / 2 - 1; i >= 0; i--) set_pixel(i, PANEL_WIDTH - 1 - i, 1, 1, 0);  		   // Yellow
+  for (int i = 0;                   i <  PANEL_WIDTH / 2; i++) set_pixel(i, i, 1, 0, 0);  			       // Red
+  for (int i = PANEL_WIDTH / 2;     i <  PANEL_WIDTH;     i++) set_pixel(i, i, 0, 1, 0);  			       // Green
+  for (int i = PANEL_WIDTH - 1;     i >= PANEL_WIDTH / 2; i--) set_pixel(i, PANEL_WIDTH - 1 - i, 0, 0, 1); // Blue
+  for (int i = PANEL_WIDTH / 2 - 1; i >= 0;               i--) set_pixel(i, PANEL_WIDTH - 1 - i, 1, 1, 0); // Yellow
 }
 
 /**
   * @brief  Draws snake pattern of given color
   *         going from the border to the center.
+  *         (intended to be used in main program while loop).
   * @param  r: Red channel (0-1)
   * @param  g: Green channel (0-1)
   * @param  b: Blue channel (0-1)
@@ -71,6 +73,7 @@ void draw_snake_pattern_in(uint8_t r, uint8_t g, uint8_t b)
 /**
   * @brief  Draws snake pattern of given color
   *         going from the center to the border.
+  *         (intended to be used in main program while loop).
   * @param  r: Red channel (0-1)
   * @param  g: Green channel (0-1)
   * @param  b: Blue channel (0-1)
@@ -122,7 +125,8 @@ void draw_snake_pattern_out(uint8_t r, uint8_t g, uint8_t b)
 }
 
 /**
-  * @brief  Draws snake pattern going in and out.
+  * @brief  Draws snake pattern going in and out
+  *         (intended to be used in main program while loop).
   * @retval None
   */
 void draw_snake_go_in_out(void)
@@ -138,6 +142,24 @@ void draw_snake_go_in_out(void)
 void draw_W_bitmap(void)
 {
   draw_rgb565_bitmap(W);
+}
+
+/**
+  * @brief  Draws AHEAD ONLY traffic sign bitmap on the screen.
+  * @retval None
+  */
+void draw_STOP_bitmap(void)
+{
+  draw_rgb565_bitmap(STOP_SIGN);
+}
+
+/**
+  * @brief  Draws AHEAD ONLY traffic sign bitmap on the screen.
+  * @retval None
+  */
+void draw_AHEAD_ONLY_bitmap(void)
+{
+  draw_rgb565_bitmap(AHEAD_ONLY_SIGN);
 }
 
 /**

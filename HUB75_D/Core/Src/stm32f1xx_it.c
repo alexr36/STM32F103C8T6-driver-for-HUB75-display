@@ -220,6 +220,6 @@ void TIM3_IRQHandler(void)
   */
 void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 {
-  //if (htim->Instance == TIM3) draw_row_update();
+  if (htim->Instance == TIM3) draw_row_update();
 }
 /* USER CODE END 1 */

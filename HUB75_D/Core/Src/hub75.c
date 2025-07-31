@@ -4,10 +4,13 @@
 #include "utils.h"
 
 // ----------------------------------------------------------------------------
-// RGB frame buffer and row counter
+// Variables
 // ----------------------------------------------------------------------------
-uint8_t framebuffer[PANEL_WIDTH][PANEL_HEIGHT][3];
-static uint8_t current_row = 0;
+uint8_t  framebuffer[PANEL_WIDTH][PANEL_HEIGHT][3];
+uint16_t brightness_level     = 0;
+int8_t   brightness_increment = 1;
+uint8_t  row_step             = 0;
+uint8_t  current_row 	      = 0;
 
 // ----------------------------------------------------------------------------
 // Display management functions
@@ -31,11 +34,6 @@ void delay_short(int reps)
   */
 void clock_pulse(void)
 {
-//  HAL_GPIO_WritePin(PORT_A, CLK_PIN, GPIO_PIN_SET);
-//  //delay_short(1);
-//  HAL_GPIO_WritePin(PORT_A, CLK_PIN, GPIO_PIN_RESET);
-
-  // Equivalent of the code above but faster
   PORT_A->BSRR = CLK_PIN;
   PORT_A->BRR  = CLK_PIN;
 }
@@ -46,11 +44,6 @@ void clock_pulse(void)
   */
 void latch_data(void)
 {
-//  HAL_GPIO_WritePin(PORT_B, LAT_PIN, GPIO_PIN_SET);
-//  //delay_short(1);
-//  HAL_GPIO_WritePin(PORT_B, LAT_PIN, GPIO_PIN_RESET);
-
-  // Equivalent of the code above but faster
   PORT_B->BSRR = LAT_PIN;
   PORT_B->BRR  = LAT_PIN;
 }
@@ -62,9 +55,6 @@ void latch_data(void)
   */
 void output_enable(uint8_t enable)
 {
-//  HAL_GPIO_WritePin(PORT_B, OE_PIN, enable ? GPIO_PIN_RESET : GPIO_PIN_SET);
-
-  // Equivalent of the code above but faster
   if (enable) PORT_B->BRR   = OE_PIN;
   else		  PORT_B->BSRR  = OE_PIN;
 }
@@ -77,11 +67,6 @@ void output_enable(uint8_t enable)
 void set_row(uint8_t row)
 {
   if (row >= RGB2_PINS_OFFSET) return;
-
-//  HAL_GPIO_WritePin(PORT_B, A_PIN, (row & 0x01) ? GPIO_PIN_SET : GPIO_PIN_RESET);
-//  HAL_GPIO_WritePin(PORT_B, B_PIN, (row & 0x02) ? GPIO_PIN_SET : GPIO_PIN_RESET);
-//  HAL_GPIO_WritePin(PORT_B, C_PIN, (row & 0x04) ? GPIO_PIN_SET : GPIO_PIN_RESET);
-//  HAL_GPIO_WritePin(PORT_B, D_PIN, (row & 0x08) ? GPIO_PIN_SET : GPIO_PIN_RESET);
 
   // Reset all pins
   PORT_B->BRR = A_PIN | B_PIN | C_PIN | D_PIN;
@@ -148,16 +133,17 @@ int is_coordinate_on_screen(const uint8_t x, const uint8_t y)
   */
 void draw_framebuffer(void)
 {
-  for (uint8_t row = 0; row < RGB2_PINS_OFFSET; row++) {
-	output_enable(0);
-
-    set_row(row);   // <- Logically it should be put here but doesn't work in a loop
+  for (uint8_t row = 0; row < RGB2_PINS_OFFSET; row++)
+  {
 	draw_row(row, 0);
 	draw_row(row, PANEL_HEIGHT_HALF);
+
+	OE_OFF;
+
+	set_row(row);
 	latch_data();
 
-	output_enable(1);
-	delay_short(2750);
+	OE_ON;
   }
 }
 
@@ -179,18 +165,10 @@ void draw_row(uint8_t row, uint8_t offset)
 	upper = row + offset;
 	lower = upper + RGB2_PINS_OFFSET;
 
-//    HAL_GPIO_WritePin(PORT_A, R1_PIN, framebuffer[col][upper][0] ? GPIO_PIN_SET : GPIO_PIN_RESET);
-//    HAL_GPIO_WritePin(PORT_A, G1_PIN, framebuffer[col][upper][1] ? GPIO_PIN_SET : GPIO_PIN_RESET);
-//    HAL_GPIO_WritePin(PORT_A, B1_PIN, framebuffer[col][upper][2] ? GPIO_PIN_SET : GPIO_PIN_RESET);
-//
-//    HAL_GPIO_WritePin(PORT_A, R2_PIN, framebuffer[col][lower][0] ? GPIO_PIN_SET : GPIO_PIN_RESET);
-//    HAL_GPIO_WritePin(PORT_A, G2_PIN, framebuffer[col][lower][1] ? GPIO_PIN_SET : GPIO_PIN_RESET);
-//    HAL_GPIO_WritePin(PORT_A, B2_PIN, framebuffer[col][lower][2] ? GPIO_PIN_SET : GPIO_PIN_RESET);
-
     // Reset all pins
     PORT_A->BRR = R1_PIN | G1_PIN | B1_PIN | R2_PIN | G2_PIN | B2_PIN;
 
-    // Set pins based on row and col number
+    // Set pins based on row and column number
     if (framebuffer[col][upper][0]) PORT_A->BSRR = R1_PIN;
     if (framebuffer[col][upper][1]) PORT_A->BSRR = G1_PIN;
     if (framebuffer[col][upper][2]) PORT_A->BSRR = B1_PIN;
@@ -240,11 +218,54 @@ void draw_rgb565_bitmap(const uint16_t* bmp_ptr)
   */
 void draw_row_update(void)
 {
-  set_row(current_row);
   draw_row(current_row, 0);
   draw_row(current_row, PANEL_HEIGHT_HALF);
+
+  OE_OFF;
+
+  set_row(current_row);
   latch_data();
+
+  OE_ON;
 
   current_row++;
   if (current_row >= RGB2_PINS_OFFSET) current_row = 0;
+
+  update_brightness();
+}
+
+
+// -- Brightness manipulation
+
+/**
+  * @brief  Checks whether TIM3 counter value is smaller than desired
+  *         brightness_level and sets OE pin  LOW or HIGH accordingly.
+  * @retval None
+  */
+void check_brightness()
+{
+  if (TIM3->CNT < brightness_level) OE_ON;
+  else 							    OE_OFF;
+}
+
+/**
+  * @brief  Updates brightness_level by incrementing or decrementing
+  *         its value by factor of 1 depending on current direction.
+  * @retval None
+  */
+void update_brightness()
+{
+  brightness_level += brightness_increment;
+
+  if (brightness_level >= 500)
+  {
+	brightness_level     = 500;
+    brightness_increment = -1;
+  }
+
+  if (brightness_level <= 0)
+  {
+	brightness_level     = 0;
+	brightness_increment = 1;
+  }
 }

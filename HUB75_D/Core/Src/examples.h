@@ -17,6 +17,8 @@ void draw_snake_go_in_out(void);
 
 // -- Drawing an example bitmap
 void draw_W_bitmap(void);
+void draw_STOP_bitmap(void);
+void draw_AHEAD_ONLY_bitmap(void);
 
 // -- Drawing an example triangle pattern on the display
 void draw_diagonal_traingle(void);
