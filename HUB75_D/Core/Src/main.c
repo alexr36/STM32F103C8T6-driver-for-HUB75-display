@@ -36,8 +36,6 @@
 
 /* Private define ------------------------------------------------------------*/
 /* USER CODE BEGIN PD */
-#define PWM_BUFFER_SIZE 		 64
-#define DEFAULT_BRIGHTNESS_LEVEL 55
 
 /* USER CODE END PD */
 
@@ -49,7 +47,6 @@
 /* Private variables ---------------------------------------------------------*/
 
 /* USER CODE BEGIN PV */
-extern uint16_t pwm_buffer[PWM_BUFFER_SIZE];
 
 /* USER CODE END PV */
 
@@ -99,14 +96,14 @@ int main(void)
   HAL_TIM_Base_Start_IT(&htim3);
   clear_framebuffer();
 
-
+  //draw_RIBBON_bitmap();
   //draw_test_cross();
   //draw_diagonal_triangle();
   //draw_W_bitmap();
   //draw_AHEAD_ONLY_bitmap();
   //draw_STOP_bitmap();
-//  draw_digit(2, 0, 0, 1, 0, 0);
-//  draw_digit(1, 32, 0, 1, 0, 0);
+  //draw_digit(2, 0, 0, 1, 0, 0);
+  //draw_digit(1, 32, 0, 1, 0, 0);
   //draw_speed(8);
   /* USER CODE END 2 */
 

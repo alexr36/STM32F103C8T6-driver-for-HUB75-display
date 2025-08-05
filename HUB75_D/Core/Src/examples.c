@@ -1,11 +1,22 @@
-#include "examples.h"
+/**
+  ******************************************************************************
+  * @file           : examples.c
+  * @brief          : Examples representing the functionality of the driver.
+  ******************************************************************************
+  */
 
+// -----------------------------------------------------------------------------
+// Includes
+// -----------------------------------------------------------------------------
+#include <stdlib.h>
+
+#include "examples.h"
 #include "bitmaps.h"
 #include "hub75.h"
 
-// -------------------------------------------------------------------------------------------------------------------
-// Example displays
-// -------------------------------------------------------------------------------------------------------------------
+// ----------------------------------------------------------------------------
+// Example display functions
+// ----------------------------------------------------------------------------
 
 // -- Drawing a cross of four different colors on diagonals of the display
 
@@ -15,8 +26,8 @@
   */
 void draw_test_cross(void)
 {
-  for (int i = 0;                   i <  PANEL_WIDTH / 2; i++) set_pixel(i, i, 1, 0, 0);  			       // Red
-  for (int i = PANEL_WIDTH / 2;     i <  PANEL_WIDTH;     i++) set_pixel(i, i, 0, 1, 0);  			       // Green
+  for (int i = 0;                   i <  PANEL_WIDTH / 2; i++) set_pixel(i, i, 1, 0, 0);                   // Red
+  for (int i = PANEL_WIDTH / 2;     i <  PANEL_WIDTH;     i++) set_pixel(i, i, 0, 1, 0);                   // Green
   for (int i = PANEL_WIDTH - 1;     i >= PANEL_WIDTH / 2; i--) set_pixel(i, PANEL_WIDTH - 1 - i, 0, 0, 1); // Blue
   for (int i = PANEL_WIDTH / 2 - 1; i >= 0;               i--) set_pixel(i, PANEL_WIDTH - 1 - i, 1, 1, 0); // Yellow
 }
@@ -44,17 +55,17 @@ void draw_snake_pattern_in(uint8_t r, uint8_t g, uint8_t b)
   {
     for (uint8_t x = left; x <= right; x++)
     {
-	  set_pixel(x, top, r, g, b);
-	  draw_framebuffer();
-	}
-	top++;
+      set_pixel(x, top, r, g, b);
+      draw_framebuffer();
+    }
+    top++;
 
-	for (uint8_t y = top; y <= bottom; y++)
-	{
+    for (uint8_t y = top; y <= bottom; y++)
+    {
       set_pixel(right, y, r, g, b);
-	  draw_framebuffer();
-	}
-	right--;
+      draw_framebuffer();
+    }
+    right--;
 
 
     if (top <= bottom)
@@ -62,7 +73,7 @@ void draw_snake_pattern_in(uint8_t r, uint8_t g, uint8_t b)
       for (int x = right; x >= left; x--)
       {
         set_pixel(x, bottom, r, g, b);
-    	draw_framebuffer();
+        draw_framebuffer();
       }
       bottom--;
     }
@@ -72,7 +83,7 @@ void draw_snake_pattern_in(uint8_t r, uint8_t g, uint8_t b)
       for (int y = bottom; y >= top; y--)
       {
         set_pixel(left, y, r, g, b);
-    	draw_framebuffer();
+        draw_framebuffer();
       }
       left++;
     }
@@ -123,7 +134,8 @@ void draw_snake_pattern_out(uint8_t r, uint8_t g, uint8_t b)
       x--;
     }
 
-    for (int i = 0; i < step; i++) {
+    for (int i = 0; i < step; i++)
+    {
       if (is_coordinate_on_screen(x, y)) set_pixel(x, y, r, g, b);
       draw_framebuffer();
       y--;
@@ -172,6 +184,15 @@ void draw_STOP_bitmap(void)
 void draw_AHEAD_ONLY_bitmap(void)
 {
   draw_rgb565_bitmap(AHEAD_ONLY_SIGN);
+}
+
+/**
+  * @brief  Draws pink ribbon bitmap on the screen.
+  * @retval None
+  */
+void draw_RIBBON_bitmap(void)
+{
+  draw_rgb565_bitmap(RIBBON);
 }
 
 

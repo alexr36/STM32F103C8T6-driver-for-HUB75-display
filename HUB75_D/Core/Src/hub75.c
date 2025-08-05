@@ -1,21 +1,32 @@
+/**
+  ******************************************************************************
+  * @file           : hub75.c
+  * @brief          : HUB75 LED display driver functions for STM32F103C8T6
+  *                   microcontroller.
+  ******************************************************************************
+  */
+
+// -----------------------------------------------------------------------------
+// Includes
+// -----------------------------------------------------------------------------
 #include "hub75.h"
 #include "stm32f1xx_hal.h"
 #include "cmsis_gcc.h"
 #include "utils.h"
 #include "digits.h"
 
-// ----------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 // Variables
-// ----------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 uint8_t  framebuffer[PANEL_WIDTH][PANEL_HEIGHT][3];
 uint16_t brightness_level     = 0;
 int8_t   brightness_increment = 1;
 uint8_t  row_step             = 0;
 uint8_t  current_row 	      = 0;
 
-// ----------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 // Display management functions
-// ----------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
 // -- GPIO manipulation
 
@@ -57,7 +68,7 @@ void latch_data(void)
 void output_enable(uint8_t enable)
 {
   if (enable) PORT_B->BRR   = OE_PIN;
-  else		  PORT_B->BSRR  = OE_PIN;
+  else        PORT_B->BSRR  = OE_PIN;
 }
 
 /**
@@ -136,20 +147,20 @@ void draw_framebuffer(void)
 {
   for (uint8_t row = 0; row < RGB2_PINS_OFFSET; row++)
   {
-	draw_row(row, 0);
-	draw_row(row, PANEL_HEIGHT_HALF);
+    draw_row(row, 0);
+    draw_row(row, PANEL_HEIGHT_HALF);
 
-	OE_OFF;
+    OE_OFF;
 
-	set_row(row);
-	latch_data();
+    set_row(row);
+    latch_data();
 
-	OE_ON;
+    OE_ON;
   }
 }
 
 /**
-  * @brief  Draws a row from framebuffer (2 panel halves).
+  * @brief  Draws a row from framebuffer.
   * @param  row: row index (0-15)
   * @param  offset: offset value (0 or 32)
   * @retval None
@@ -163,8 +174,8 @@ void draw_row(uint8_t row, uint8_t offset)
 
   for (int col = 0; col < PANEL_WIDTH; col++)
   {
-	upper = row + offset;
-	lower = upper + RGB2_PINS_OFFSET;
+    upper = row + offset;
+    lower = upper + RGB2_PINS_OFFSET;
 
     // Reset all pins
     PORT_A->BRR = R1_PIN | G1_PIN | B1_PIN | R2_PIN | G2_PIN | B2_PIN;
@@ -181,6 +192,30 @@ void draw_row(uint8_t row, uint8_t offset)
     clock_pulse();
   }
 }
+
+/**
+  * @brief  Updates rows displayed on the screen
+  *         (Intended to use with Timer Interruption).
+  * @retval None
+  */
+void draw_row_update(void)
+{
+  draw_row(current_row, 0);
+  draw_row(current_row, PANEL_HEIGHT_HALF);
+
+  OE_OFF;
+
+  set_row(current_row);
+  latch_data();
+
+  OE_ON;
+
+  current_row++;
+  if (current_row >= RGB2_PINS_OFFSET) current_row = 0;
+}
+
+
+// -- Drawing bitmaps
 
 /**
   * @brief  Draws given bitmap on the screen.
@@ -212,29 +247,6 @@ void draw_rgb565_bitmap(const uint16_t* bmp_ptr)
   draw_framebuffer();
 }
 
-/**
-  * @brief  Updates rows displayed on the screen
-  *         (Intended to use with Timer Interruption).
-  * @retval None
-  */
-void draw_row_update(void)
-{
-  draw_row(current_row, 0);
-  draw_row(current_row, PANEL_HEIGHT_HALF);
-
-  OE_OFF;
-
-  set_row(current_row);
-  latch_data();
-
-  OE_ON;
-
-  current_row++;
-  if (current_row >= RGB2_PINS_OFFSET) current_row = 0;
-
-  update_brightness();
-}
-
 
 // -- Drawing digits
 
@@ -261,15 +273,16 @@ void draw_digit(uint8_t digit, uint8_t x_offset, uint8_t y_offset, uint8_t r, ui
 
       for (uint8_t bit = 0; bit < 8; bit++)
       {
-    	  uint8_t x     = byte * 8 + (7 - bit);
-    	  uint8_t x_pos = x + x_offset;
-    	  uint8_t y_pos = y + y_offset;
+    	// Calculate exact position on display
+        uint8_t x     = byte * 8 + (7 - bit);
+        uint8_t x_pos = x + x_offset;
+        uint8_t y_pos = y + y_offset;
 
-    	  if (x_pos >= 0 && y_pos < PANEL_HEIGHT && x_pos < PANEL_HEIGHT && y_pos >= 0)
-    	  {
-            uint8_t bit_on = (data >> bit) & 0x01;
-            set_pixel(x_pos, y_pos, bit_on ? r : 0, bit_on ? g : 0, bit_on ? b : 0);
-    	  }
+        if (x_pos >= 0 && y_pos < PANEL_HEIGHT && x_pos < PANEL_HEIGHT && y_pos >= 0)
+        {
+          uint8_t bit_on = (data >> bit) & 0x01;
+          set_pixel(x_pos, y_pos, bit_on ? r : 0, bit_on ? g : 0, bit_on ? b : 0);
+        }
       }
     }
   }
@@ -277,6 +290,7 @@ void draw_digit(uint8_t digit, uint8_t x_offset, uint8_t y_offset, uint8_t r, ui
 
 /**
   * @brief  Drawing given speed value on the display.
+  *         Values below 30 are displayed in green, values above 30 in red.
   * @param  speed: speed value to be displayed (0-99)
   * @retval None
   */
@@ -287,20 +301,19 @@ void draw_speed(uint8_t speed)
   uint8_t tens  = speed / 10;
   uint8_t units = speed % 10;
 
-  uint8_t* color[3] = {0, 0, 0};
+  uint8_t color[3] = {0, 0, 0};
 
-  if (speed <= 30) color[1] = 1;
-  else             color[0] = 1;
+  if (speed <= SAFE_SPEED_LIMIT) color[1] = 1;
+  else                           color[0] = 1;
 
   uint8_t r = color[0];
   uint8_t g = color[1];
-  uint8_t b = color[2];
 
-  if (speed < 10) draw_digit(units, RGB2_PINS_OFFSET, 0, r, g, b);
+  if (speed < 10) draw_digit(units, RGB2_PINS_OFFSET, 0, r, g, 0);
   else
   {
-    draw_digit(tens, 0, 0, r, g, b);
-    draw_digit(units, PANEL_HEIGHT_HALF, 0, r, g, b);
+    draw_digit(tens, 0, 0, r, g, 0);
+    draw_digit(units, PANEL_HEIGHT_HALF, 0, r, g, 0);
   }
 }
 
@@ -315,7 +328,7 @@ void draw_speed(uint8_t speed)
 void check_brightness()
 {
   if (TIM3->CNT < brightness_level) OE_ON;
-  else 							    OE_OFF;
+  else                              OE_OFF;
 }
 
 /**
@@ -329,13 +342,13 @@ void update_brightness()
 
   if (brightness_level >= 500)
   {
-	brightness_level     = 500;
+    brightness_level     = 500;
     brightness_increment = -1;
   }
 
   if (brightness_level <= 0)
   {
-	brightness_level     = 0;
-	brightness_increment = 1;
+    brightness_level     = 0;
+    brightness_increment = 1;
   }
 }
