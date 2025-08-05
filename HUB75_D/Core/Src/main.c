@@ -99,20 +99,25 @@ int main(void)
   HAL_TIM_Base_Start_IT(&htim3);
   clear_framebuffer();
 
+
   //draw_test_cross();
   //draw_diagonal_triangle();
   //draw_W_bitmap();
-  draw_AHEAD_ONLY_bitmap();
+  //draw_AHEAD_ONLY_bitmap();
   //draw_STOP_bitmap();
-
+//  draw_digit(2, 0, 0, 1, 0, 0);
+//  draw_digit(1, 32, 0, 1, 0, 0);
+  //draw_speed(8);
   /* USER CODE END 2 */
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
   while (1)
   {
+	draw_random_speed();
 	//update_brightness();
 	//if (TIM3->CNT > 55) OE_OFF;
+
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */

@@ -2,6 +2,7 @@
 #include "stm32f1xx_hal.h"
 #include "cmsis_gcc.h"
 #include "utils.h"
+#include "digits.h"
 
 // ----------------------------------------------------------------------------
 // Variables
@@ -102,9 +103,9 @@ void clear_framebuffer(void)
   * @brief  Sets a pixel in framebuffer to display an RGB color.
   * @param  x: X coordinate (0-64)
   * @param  y: Y coordinate (0-64)
-  * @param  r: Red channel (0 or 1)
-  * @param  g: Green channel (0 or 1)
-  * @param  b: Blue channel (0 or 1)
+  * @param  r: red channel (0 or 1)
+  * @param  g: green channel (0 or 1)
+  * @param  b: blue channel (0 or 1)
   * @retval None
   */
 void set_pixel(uint8_t x, uint8_t y, uint8_t r, uint8_t g, uint8_t b)
@@ -232,6 +233,75 @@ void draw_row_update(void)
   if (current_row >= RGB2_PINS_OFFSET) current_row = 0;
 
   update_brightness();
+}
+
+
+// -- Drawing digits
+
+/**
+  * @brief  Draws given digit of given color
+  *         in given offset on the display.
+  * @param  digit: digit to be drawn on the display (0-9)
+  * @param  x_offset: digit offset along X axis (0-63)
+  * @param  y_offset: digit offset along Y axis (0-63)
+  * @param  r: red channel (0 or 1)
+  * @param  g: green channel (0 or 1)
+  * @param  b: blue channel (0 or 1)
+  * @retval None
+  */
+void draw_digit(uint8_t digit, uint8_t x_offset, uint8_t y_offset, uint8_t r, uint8_t g, uint8_t b)
+{
+  if (digit > 9 || x_offset >= PANEL_WIDTH || y_offset >= PANEL_HEIGHT) return;
+
+  for (uint8_t y = 0; y < PANEL_HEIGHT; y++)
+  {
+    for (uint8_t byte = 0; byte < 4; byte++)
+    {
+      uint8_t data = digits_bmp[digit][y * 4 + byte];
+
+      for (uint8_t bit = 0; bit < 8; bit++)
+      {
+    	  uint8_t x     = byte * 8 + (7 - bit);
+    	  uint8_t x_pos = x + x_offset;
+    	  uint8_t y_pos = y + y_offset;
+
+    	  if (x_pos >= 0 && y_pos < PANEL_HEIGHT && x_pos < PANEL_HEIGHT && y_pos >= 0)
+    	  {
+            uint8_t bit_on = (data >> bit) & 0x01;
+            set_pixel(x_pos, y_pos, bit_on ? r : 0, bit_on ? g : 0, bit_on ? b : 0);
+    	  }
+      }
+    }
+  }
+}
+
+/**
+  * @brief  Drawing given speed value on the display.
+  * @param  speed: speed value to be displayed (0-99)
+  * @retval None
+  */
+void draw_speed(uint8_t speed)
+{
+  if (speed < 0 || speed > 99) return;
+
+  uint8_t tens  = speed / 10;
+  uint8_t units = speed % 10;
+
+  uint8_t* color[3] = {0, 0, 0};
+
+  if (speed <= 30) color[1] = 1;
+  else             color[0] = 1;
+
+  uint8_t r = color[0];
+  uint8_t g = color[1];
+  uint8_t b = color[2];
+
+  if (speed < 10) draw_digit(units, RGB2_PINS_OFFSET, 0, r, g, b);
+  else
+  {
+    draw_digit(tens, 0, 0, r, g, b);
+    draw_digit(units, PANEL_HEIGHT_HALF, 0, r, g, b);
+  }
 }
 
 

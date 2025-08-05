@@ -68,6 +68,10 @@ void draw_row(uint8_t row, uint8_t offset);
 void draw_rgb565_bitmap(const uint16_t* bmp_ptr);
 void draw_row_update(void);
 
+// -- Drawing digits
+void draw_digit(uint8_t digit, uint8_t x_offset, uint8_t y_offset, uint8_t r, uint8_t g, uint8_t b);
+void draw_speed(uint8_t speed);
+
 // -- Brightness manipulation
 void update_brightness(void);
 void check_brightness(void);

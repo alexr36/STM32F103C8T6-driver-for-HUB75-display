@@ -23,4 +23,7 @@ void draw_AHEAD_ONLY_bitmap(void);
 // -- Drawing an example triangle pattern on the display
 void draw_diagonal_traingle(void);
 
+// -- Drawing a random speed value on the display
+void draw_random_speed(void);
+
 #endif // EXAMPLES_H
