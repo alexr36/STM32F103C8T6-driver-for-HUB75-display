@@ -45,6 +45,12 @@ void draw_brightness_frame(uint8_t brightness_level)
 }
 
 
+// -- Debugging utilities
+
+/**
+  * @brief  Pulses a LED diode. Useful while debugging.
+  * @retval None
+  */
 void debug_diode_pulse(void)
 {
   HAL_Delay(1000);

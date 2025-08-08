@@ -52,15 +52,9 @@
 #define OE_OFF  output_enable(0)
 
 // -----------------------------------------------------------------------------
-// Speed display configuration
-// -----------------------------------------------------------------------------
-#define SAFE_SPEED_LIMIT 30
-
-// -----------------------------------------------------------------------------
 // Variables
 // -----------------------------------------------------------------------------
 extern uint8_t  framebuffer[PANEL_WIDTH][PANEL_HEIGHT][3];
-extern uint8_t  rx_buffer[9];
 extern uint16_t brightness_level;
 extern int8_t   brightness_increment;
 extern uint8_t  row_step;

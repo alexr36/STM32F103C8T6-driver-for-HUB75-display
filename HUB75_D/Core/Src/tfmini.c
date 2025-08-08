@@ -15,6 +15,7 @@
 #include "tfmini.h"
 #include "hub75.h"
 #include "utils.h"
+#include "examples.h"
 
 // -----------------------------------------------------------------------------
 // Variables
@@ -27,6 +28,7 @@ uint8_t  TFmini_frame_index = 0;
 uint32_t tick_last          = 0;
 uint16_t distance_prev      = 0;
 uint8_t  speed_last         = 0;
+int      is_drawn           = 2;
 
 volatile uint16_t TFmini_distance    = 0;
 volatile uint8_t  TFmini_frame_ready = 0;
@@ -112,7 +114,7 @@ float calculate_speed(uint16_t dist_1, uint16_t dist_2, uint32_t time_delta)
   * @brief  Gathers data required to calculate speed and displays it.
   * @retval None
   */
-void process_velocity(void)
+void process_speed(void)
 {
   if (!TFmini_frame_ready) return;
 
@@ -138,4 +140,51 @@ void process_velocity(void)
 
   distance_prev = distance_now;
   tick_last     = tick_now;
+  HAL_Delay(500);
 }
+
+
+// -- Displaying traffic signs based on detected distance ----------------------
+
+/**
+  * @brief  Turns off and on TIM3 Interrupts in order to avoid screen
+  *         flickering while dynamically changing the displayed bitmap.
+  * @param  id_drawn_updated_state: Updated 'is_drawn' flag value of currently displayed traffic sign
+  * @param  draw_bitmap: Pointer to a function responsible for drawing a certain traffic sign
+  * @retval None
+  */
+void omit_flickering(uint8_t is_drawn_updated_state, void (*draw_bitmap)(void))
+{
+  HAL_NVIC_DisableIRQ(TIM3_IRQn);
+  clear_framebuffer();
+  is_drawn = is_drawn_updated_state;
+  (*draw_bitmap)();
+  HAL_NVIC_EnableIRQ(TIM3_IRQn);
+}
+
+/**
+  * @brief  Displays STOP or AHEAD ONLY traffic sign
+  *         based on safe distance to the object.
+  * @retval None
+  */
+void inform_about_object(void)
+{
+  if (!TFmini_frame_ready) return;
+
+  TFmini_frame_ready = 0;
+
+  uint32_t tick_now     = HAL_GetTick();
+  uint16_t distance_now = TFmini_distance;
+
+  if (distance_now == 0 || distance_now == 0xFFFF) return;
+
+  if (tick_last != 0)
+  {
+    if      (distance_now < SAFE_DISTANCE_CM  && is_drawn != 0) omit_flickering(0, draw_STOP_bitmap);
+    else if (distance_now >= SAFE_DISTANCE_CM && is_drawn != 1) omit_flickering(1, draw_AHEAD_ONLY_bitmap);
+  }
+
+  tick_last = tick_now;
+  HAL_Delay(500);
+}
+

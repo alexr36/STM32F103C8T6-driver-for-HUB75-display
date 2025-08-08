@@ -39,7 +39,7 @@
 
 /* Private define ------------------------------------------------------------*/
 /* USER CODE BEGIN PD */
-
+#define MODE 1
 /* USER CODE END PD */
 
 /* Private macro -------------------------------------------------------------*/
@@ -108,8 +108,8 @@ int main(void)
 
   while (1)
   {
-    process_velocity();
-    HAL_Delay(500);
+	if (MODE == 0) process_speed();
+	if (MODE == 1) inform_about_object();
 
     /* USER CODE END WHILE */
 

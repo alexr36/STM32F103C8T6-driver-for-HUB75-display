@@ -18,7 +18,9 @@
 // -----------------------------------------------------------------------------
 // Required constants
 // -----------------------------------------------------------------------------
-#define TFmini_FRAME_SIZE  9
+#define TFmini_FRAME_SIZE    9
+#define SAFE_DISTANCE_CM     300
+#define SAFE_SPEED_LIMIT_KMH 30
 
 // -----------------------------------------------------------------------------
 // Variables
@@ -39,6 +41,10 @@ int   is_checksum_valid(void);
 
 // -- Calculating speed --------------------------------------------------------
 float calculate_speed(uint16_t dist_1, uint16_t dist_2, uint32_t time_delta);
-void  process_velocity(void);
+void  process_speed(void);
+
+// -- Displaying traffic signs based on detected distance ----------------------
+void  omit_flickering(uint8_t is_drawn_updated_state, void (*draw_bitmap)(void));
+void  inform_about_object(void);
 
 #endif //TFMINI_H

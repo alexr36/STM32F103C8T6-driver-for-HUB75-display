@@ -17,12 +17,12 @@
 #include "cmsis_gcc.h"
 #include "utils.h"
 #include "digits.h"
+#include "tfmini.h"
 
 // -----------------------------------------------------------------------------
 // Variables
 // -----------------------------------------------------------------------------
 uint8_t  framebuffer[PANEL_WIDTH][PANEL_HEIGHT][3];
-uint8_t  rx_buffer[9];
 uint16_t brightness_level     = 0;
 int8_t   brightness_increment = 1;
 uint8_t  row_step             = 0;
@@ -306,13 +306,11 @@ void draw_speed(uint8_t speed)
   uint8_t units = speed % 10;
 
   // There's no need for handling blue color
-  uint8_t color[2] = {0, 0};
+  uint8_t r = 0;
+  uint8_t g = 0;
 
-  if (speed <= SAFE_SPEED_LIMIT) color[1] = 1;
-  else                           color[0] = 1;
-
-  uint8_t r = color[0];
-  uint8_t g = color[1];
+  if (speed <= SAFE_SPEED_LIMIT_KMH) g = 1;
+  else                               r = 1;
 
   if (speed < 10) draw_digit(units, RGB2_PINS_OFFSET, 0, r, g, 0);
   else
