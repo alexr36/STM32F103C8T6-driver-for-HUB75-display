@@ -9,8 +9,11 @@
 // -----------------------------------------------------------------------------
 // Includes
 // -----------------------------------------------------------------------------
+#include <stdlib.h>
+
 #include "hub75.h"
 #include "stm32f1xx_hal.h"
+#include "usart.h"
 #include "cmsis_gcc.h"
 #include "utils.h"
 #include "digits.h"
@@ -19,6 +22,7 @@
 // Variables
 // -----------------------------------------------------------------------------
 uint8_t  framebuffer[PANEL_WIDTH][PANEL_HEIGHT][3];
+uint8_t  rx_buffer[9];
 uint16_t brightness_level     = 0;
 int8_t   brightness_increment = 1;
 uint8_t  row_step             = 0;
@@ -28,7 +32,7 @@ uint8_t  current_row 	      = 0;
 // Display management functions
 // -----------------------------------------------------------------------------
 
-// -- GPIO manipulation
+// -- GPIO manipulation --------------------------------------------------------
 
 /**
   * @brief  Short software delay using NOPs.
@@ -91,7 +95,7 @@ void set_row(uint8_t row)
 }
 
 
-// -- Configuration
+// -- Configuration ------------------------------------------------------------
 
 /**
   * @brief  Clears the entire framebuffer by setting all pixels to black.
@@ -248,7 +252,7 @@ void draw_rgb565_bitmap(const uint16_t* bmp_ptr)
 }
 
 
-// -- Drawing digits
+// -- Drawing digits -----------------------------------------------------------
 
 /**
   * @brief  Draws given digit of given color
@@ -301,7 +305,8 @@ void draw_speed(uint8_t speed)
   uint8_t tens  = speed / 10;
   uint8_t units = speed % 10;
 
-  uint8_t color[3] = {0, 0, 0};
+  // There's no need for handling blue color
+  uint8_t color[2] = {0, 0};
 
   if (speed <= SAFE_SPEED_LIMIT) color[1] = 1;
   else                           color[0] = 1;
@@ -318,7 +323,7 @@ void draw_speed(uint8_t speed)
 }
 
 
-// -- Brightness manipulation
+// -- Brightness manipulation --------------------------------------------------
 
 /**
   * @brief  Checks whether TIM3 counter value is smaller than desired

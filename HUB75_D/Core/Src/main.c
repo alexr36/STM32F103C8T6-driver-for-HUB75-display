@@ -18,12 +18,15 @@
 /* USER CODE END Header */
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
+#include "dma.h"
 #include "tim.h"
+#include "usart.h"
 #include "gpio.h"
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 #include "hub75.h"
+#include "tfmini.h"
 #include "oe_control.h"
 #include "utils.h"
 #include "examples.h"
@@ -90,30 +93,23 @@ int main(void)
 
   /* Initialize all configured peripherals */
   MX_GPIO_Init();
+  MX_DMA_Init();
   MX_TIM3_Init();
+  MX_USART1_UART_Init();
   /* USER CODE BEGIN 2 */
-  //OE_PWM_Init();
   HAL_TIM_Base_Start_IT(&htim3);
+  TFmini_UART_Init_DMA();
   clear_framebuffer();
 
-  //draw_RIBBON_bitmap();
-  //draw_test_cross();
-  //draw_diagonal_triangle();
-  //draw_W_bitmap();
-  //draw_AHEAD_ONLY_bitmap();
-  //draw_STOP_bitmap();
-  //draw_digit(2, 0, 0, 1, 0, 0);
-  //draw_digit(1, 32, 0, 1, 0, 0);
-  //draw_speed(8);
   /* USER CODE END 2 */
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
+
   while (1)
   {
-	draw_random_speed();
-	//update_brightness();
-	//if (TIM3->CNT > 55) OE_OFF;
+    process_velocity();
+    HAL_Delay(500);
 
     /* USER CODE END WHILE */
 

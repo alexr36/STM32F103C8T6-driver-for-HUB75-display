@@ -57,9 +57,10 @@
 #define SAFE_SPEED_LIMIT 30
 
 // -----------------------------------------------------------------------------
-// RGB frame buffer
+// Variables
 // -----------------------------------------------------------------------------
 extern uint8_t  framebuffer[PANEL_WIDTH][PANEL_HEIGHT][3];
+extern uint8_t  rx_buffer[9];
 extern uint16_t brightness_level;
 extern int8_t   brightness_increment;
 extern uint8_t  row_step;
@@ -69,31 +70,31 @@ extern uint8_t  current_row;
 // Display management functions
 // -----------------------------------------------------------------------------
 
-// -- GPIO manipulation
+// -- GPIO manipulation --------------------------------------------------------
 void delay_short(int reps);
 void clock_pulse(void);
 void latch_data(void);
 void output_enable(uint8_t enable);
 void set_row(uint8_t row);
 
-// -- Configuration
+// -- Configuration ------------------------------------------------------------
 void clear_framebuffer(void);
 void set_pixel(uint8_t x, uint8_t y, uint8_t r, uint8_t g, uint8_t b);
 int  is_coordinate_on_screen(const uint8_t x, const uint8_t y);
 
-// -- Drawing
+// -- Drawing ------------------------------------------------------------------
 void draw_framebuffer(void);
 void draw_row(uint8_t row, uint8_t offset);
 void draw_row_update(void);
 
-// -- Drawing bitmaps
+// -- Drawing bitmaps ----------------------------------------------------------
 void draw_rgb565_bitmap(const uint16_t* bmp_ptr);
 
-// -- Drawing digits
+// -- Drawing digits -----------------------------------------------------------
 void draw_digit(uint8_t digit, uint8_t x_offset, uint8_t y_offset, uint8_t r, uint8_t g, uint8_t b);
 void draw_speed(uint8_t speed);
 
-// -- Brightness manipulation
+// -- Brightness manipulation --------------------------------------------------
 void update_brightness(void);
 void check_brightness(void);
 

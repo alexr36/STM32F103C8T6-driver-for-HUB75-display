@@ -14,4 +14,6 @@
 void PWM_screen_fade(uint8_t max_brightness);
 void draw_brightness_frame(uint8_t brightness_level);
 
+void debug_diode_pulse();
+
 #endif // UTILS_H

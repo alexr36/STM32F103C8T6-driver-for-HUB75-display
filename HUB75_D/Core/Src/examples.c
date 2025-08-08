@@ -18,7 +18,7 @@
 // Example display functions
 // ----------------------------------------------------------------------------
 
-// -- Drawing a cross of four different colors on diagonals of the display
+// -- Drawing a cross of four different colors on diagonals of the display ----
 
 /**
   * @brief  Draws four-coloured cross on display's diagonals.
@@ -33,7 +33,7 @@ void draw_test_cross(void)
 }
 
 
-// -- Drawing snake pattern on the display
+// -- Drawing snake pattern on the display -------------------------------------
 
 /**
   * @brief  Draws snake pattern of given color
@@ -157,7 +157,7 @@ void draw_snake_go_in_out(void)
 }
 
 
-// -- Drawing an example bitmap
+// -- Drawing an example bitmap ------------------------------------------------
 
 /**
   * @brief  Draws an example "W" bitmap on the screen.
@@ -196,7 +196,7 @@ void draw_RIBBON_bitmap(void)
 }
 
 
-// -- Drawing an example triangle pattern on the display
+// -- Drawing an example triangle pattern on the display -----------------------
 
 /**
   * @brief  Draws a red triangle on a whole half of the display.
@@ -211,7 +211,7 @@ void draw_diagonal_triangle(void)
 }
 
 
-// -- Drawing a random speed value on the display
+// -- Drawing a random speed value on the display ------------------------------
 
 /**
   * @brief  Draws a random bumber from range [0-99].

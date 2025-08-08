@@ -4,6 +4,7 @@
 #include "utils.h"
 #include "oe_control.h"
 #include "hub75.h"
+#include "gpio.h"
 
 // ----------------------------------------------------------------------------
 // Utility functions
@@ -41,4 +42,13 @@ void draw_brightness_frame(uint8_t brightness_level)
 {
   OE_set_brightness(brightness_level);
   //draw_framebuffer();
+}
+
+
+void debug_diode_pulse(void)
+{
+  HAL_Delay(1000);
+  HAL_GPIO_TogglePin(GPIOC, GPIO_PIN_13);
+  HAL_Delay(1000);
+  HAL_GPIO_TogglePin(GPIOC, GPIO_PIN_13);
 }
