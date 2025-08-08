@@ -1,1 +1,49 @@
+# STM32CubeIDE - ignore all except source/config files
+# === Project build artifacts ===
 /Debug/
+/Release/
+/build/
+/.build/
+*.o
+*.d
+*.elf
+*.bin
+*.hex
+*.map
+*.list
+*.log
+*.pyc
+*.exe
+*.out
+
+# === STM32CubeIDE-specific ===
+/.cproject
+/.project
+/.settings/
+*.launch
+*.orig
+*.bak
+
+# === IDE & OS trash ===
+*.swp
+*~
+.DS_Store
+Thumbs.db
+*.user
+*.suo
+
+# === CubeMX-generated metadata (can be regenerated) ===
+/MX_Configuration.xml
+/.mxproject
+
+# === Optional: exclude core generated HAL files if managed externally ===
+# /Drivers/STM32F1xx_HAL_Driver/
+# /Drivers/CMSIS/
+
+# === Keep only relevant source files ===
+!Core/**
+!Drivers/**
+!Inc/**
+!Src/**
+!Makefile
+!.gitignore
