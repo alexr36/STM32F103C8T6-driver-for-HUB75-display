@@ -109,4 +109,4 @@ Parts of this project are based on STM32CubeMX-generated code.
 That code is © STMicroelectronics and provided under their Software License Agreement.
 
 All other code in this repository is licensed under the Apache License, Version 2.0.
-Check ![LICENSE](https://github.com/alexr36/STM32F103C8T6-driver-for-HUB75-display/blob/d22e16d945067127de811e61a1a349b4b6f1b803/LICENSE) for more information.
+Check [LICENSE](https://github.com/alexr36/STM32F103C8T6-driver-for-HUB75-display/blob/d22e16d945067127de811e61a1a349b4b6f1b803/LICENSE) for more information.
