@@ -36,12 +36,16 @@ This project controls a 64x64 RGB LED matrix panel with a HUB75 interface using 
 | R2     | PA3       | GPIOA     |
 | G2     | PA4       | GPIOA     |
 | B2     | PA5       | GPIOA     |
-| CLK    | PA6       | GPIOA     |
-| LAT    | PB10      | GPIOB     |
-| OE     | PB11      | GPIOB     |
-| A-D    | PB12-15   | GPIOB     |
+| CLK    | PA15      | GPIOA     |
+| OE     | PB0       | GPIOB     |
+| D      | PB3       | GPIOB     |
+| C      | PB4       | GPIOB     |
+| B      | PB5       | GPIOB     |
+| A      | PB6       | GPIOB     |
+| LAT    | PB7       | GPIOB     |
 
-*Adjust based on your `hub75.h` definitions.*
+
+*Remember to adjust based on your `hub75.h` definitions.*
 
 
 ## Project Structure
