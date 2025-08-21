@@ -88,7 +88,7 @@ draw_rgb565_bitmap(my_own_bitmap);  // Draw given bitmap on the screen
 ### Displaying speed
 ```c
 while (1) {
-    process_speed();
+    process_speed();  // Put this in main while() loop in order to refresh the screen
 }
 ```
 
