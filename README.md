@@ -1,7 +1,6 @@
 # STM32F103C8T6 driver (HUB75 display and TFmini Plus LiDAR integration)
 This project controls a 64x64 RGB LED matrix panel with a HUB75 interface using an STM32F103C8T6 ("Blue Pill") and TFmini Plus LiDAR in order to measure and display velocity of moving objects.
 
----
 
 ## Featrues
 - Manual control of CLK (Clock), OE (Output Enable), LAT (Latch) and address lines (A, B, C, D)
@@ -9,7 +8,6 @@ This project controls a 64x64 RGB LED matrix panel with a HUB75 interface using 
 - Optimized GPIO access using BSRR/BRR registers
 - Framebuffer-based rendering
 
----
 
 ## How It Works
 - The framebuffer is a `uint8_t framebuffer[64][64][3]` structure storing RGB values per pixel.
@@ -20,7 +18,6 @@ This project controls a 64x64 RGB LED matrix panel with a HUB75 interface using 
   - LAT and OE signals are pulsed
   - Address lines are updated
 
----
 
 ## Hardware Requirements
 - STM32F103C8T6 ("Blue Pill")
@@ -29,7 +26,6 @@ This project controls a 64x64 RGB LED matrix panel with a HUB75 interface using 
 - 5V power supply (3A recommended)
 - ST-Link V2 or USB-UART for flashing 
 
----
 
 ## Pin Configuration (Example)
 | Signal | STM32 Pin | GPIO Port |
@@ -47,7 +43,6 @@ This project controls a 64x64 RGB LED matrix panel with a HUB75 interface using 
 
 *Adjust based on your `hub75.h` definitions.*
 
----
 
 ## Project Structure
 ```
@@ -69,7 +64,6 @@ This project controls a 64x64 RGB LED matrix panel with a HUB75 interface using 
 ├── README.md
 ```
 
----
 
 ## Basic Examples
 
@@ -90,4 +84,9 @@ draw_rgb565_bitmap(my_own_bitmap);  // Draw given bitmap on the screen
 `draw_framebuffer()` method is desinged to be used in main while() loop and `draw_rgb565_bitmap()` outside of it.
 Every already implemented function has a note on where it should be used, however while implementing your own functions remember that display refresh can be and is performed during timer interruption (automatically).
 
----
+
+## Example Photos
+- Displaying current velocity
+  ![Current velocity](https://github.com/alexr36/STM32F103C8T6-driver-for-HUB75-display/blob/8e6d8838c16f282d87e6c73454635641f9883fe9/photos/velocity.png)
+- Displaying a traffic sign bitmap
+  ![STOP traffic sign](https://github.com/alexr36/STM32F103C8T6-driver-for-HUB75-display/blob/8e6d8838c16f282d87e6c73454635641f9883fe9/photos/traffic_sign_bitmap.png)
