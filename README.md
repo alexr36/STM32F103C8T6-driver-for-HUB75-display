@@ -81,8 +81,8 @@ draw_rgb565_bitmap(my_own_bitmap);  // Draw given bitmap on the screen
 ```
 
 #### Important Note
-`draw_framebuffer()` method is desinged to be used in main while() loop and `draw_rgb565_bitmap()` outside of it.
-Every already implemented function has a note on where it should be used, however while implementing your own functions remember that display refresh can be and is performed during timer interruption (automatically).
+`draw_framebuffer()` method is desinged to be used in main `while()` loop and `draw_rgb565_bitmap()` outside of it.
+Every already implemented drawing function has a note on where it should be used, however while implementing your own functions remember that display refresh can be and is performed during timer interruption (automatically).
 
 
 ## Example Photos
