@@ -7,6 +7,7 @@ This project controls a 64x64 RGB LED matrix panel with a HUB75 interface using 
 - Supports drawing single pixels as well as 3-bit colored bitmaps
 - Optimized GPIO access using BSRR/BRR registers
 - Framebuffer-based rendering
+- Optional TFmini Plus LiDAR integration (for displaying real-time measured speed)
 
 
 ## How It Works
@@ -82,6 +83,13 @@ draw_framebuffer();         // Draw pixel on the screen
 ```c
 clear_framebuffer();                // Ensure the framebuffer is empty
 draw_rgb565_bitmap(my_own_bitmap);  // Draw given bitmap on the screen
+```
+
+### Displaying speed
+```c
+while (1) {
+    process_speed();
+}
 ```
 
 #### Important Note
