@@ -102,3 +102,11 @@ Every already implemented drawing function that should be used inside of main lo
   ![Current velocity](https://github.com/alexr36/STM32F103C8T6-driver-for-HUB75-display/blob/8e6d8838c16f282d87e6c73454635641f9883fe9/photos/velocity.png)
 - Displaying a traffic sign bitmap
   ![STOP traffic sign](https://github.com/alexr36/STM32F103C8T6-driver-for-HUB75-display/blob/8e6d8838c16f282d87e6c73454635641f9883fe9/photos/traffic_sign_bitmap.png)
+
+
+## License
+Parts of this project are based on STM32CubeMX-generated code.
+That code is © STMicroelectronics and provided under their Software License Agreement.
+
+All other code in this repository is licensed under the Apache License, Version 2.0.
+Check ![LICENSE](https://github.com/alexr36/STM32F103C8T6-driver-for-HUB75-display/blob/d22e16d945067127de811e61a1a349b4b6f1b803/LICENSE) for more information.
