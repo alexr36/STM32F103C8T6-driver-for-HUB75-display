@@ -65,7 +65,6 @@ extern uint8_t  current_row;
 // -----------------------------------------------------------------------------
 
 // -- GPIO manipulation --------------------------------------------------------
-void delay_short(int reps);
 void clock_pulse(void);
 void latch_data(void);
 void output_enable(uint8_t enable);

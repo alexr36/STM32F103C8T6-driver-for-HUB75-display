@@ -17,4 +17,7 @@ void draw_brightness_frame(uint8_t brightness_level);
 // -- Debugging utilities ------------------------------------------------------
 void debug_diode_pulse();
 
+// -- Custom short delay -------------------------------------------------------
+void delay_short(int reps);
+
 #endif // UTILS_H

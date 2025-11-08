@@ -35,16 +35,6 @@ uint8_t  current_row 	      = 0;
 // -- GPIO manipulation --------------------------------------------------------
 
 /**
-  * @brief  Short software delay using NOPs.
-  * @param  reps: Number of repetitions.
-  * @retval None
-  */
-void delay_short(int reps)
-{
-  for (volatile int i = 0; i < reps; ++i) __NOP();
-}
-
-/**
   * @brief  Generates a single clock pulse.
   * @retval None
   */

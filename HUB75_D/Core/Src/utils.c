@@ -58,3 +58,16 @@ void debug_diode_pulse(void)
   HAL_Delay(1000);
   HAL_GPIO_TogglePin(GPIOC, GPIO_PIN_13);
 }
+
+
+// -- Custom short delay
+
+/**
+  * @brief  Short software delay using NOPs.
+  * @param  reps: Number of repetitions.
+  * @retval None
+  */
+void delay_short(int reps)
+{
+  for (volatile int i = 0; i < reps; ++i) __NOP();
+}
