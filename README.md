@@ -56,17 +56,17 @@ This project controls a 64x64 RGB LED matrix panel with a HUB75 interface using 
 │   ├── Core/                       # Main application code (user code + auto-generated)
 │   │   ├── Inc/                    # User header files (.h) with necessary declarations and definitions
 │   │   ├── Src/                    # User source files (.c) with main logic and functions
-│   │   ├── Startup/                # Startup code and vector table (startup_stm32f103xx.s)
-│   │
+│   │   └── Startup/                # Startup code and vector table (startup_stm32f103xx.s)
+│   |
 │   ├── Drivers/                    # MCU-specific low-level driver files
 │   │   ├── CMSIS/                  # Cortex-M CMSIS headers and core access
-│   │   ├── STM32F1xx_HAL_Driver/   # STM32 HAL libraries for the F1 family
+│   │   └── STM32F1xx_HAL_Driver/   # STM32 HAL libraries for the F1 family
 │   │
 │   ├── .mxproject                  # STM32CubeMX project metadata (for toolchain integration)
 │   ├── HUB75_D.ioc                 # STM32CubeMX configuration file (pinout, clocks, peripherals)
-│   ├── STM32F103C8TX_FLASH.ld      # Linker script (defines memory layout)
+│   └── STM32F103C8TX_FLASH.ld      # Linker script (defines memory layout)
 │   
-├── README.md
+└── README.md
 ```
 
 
